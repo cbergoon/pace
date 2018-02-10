@@ -1,2 +1,2 @@
-# pace
+# Pace
 CLI Time Tracker 
