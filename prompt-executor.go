@@ -8,10 +8,6 @@ import (
 	"github.com/andygrunwald/go-jira"
 )
 
-//TODO FUTURE [will-do]: Project shortcuts ie 'WEBPORTAL-' -> 'WP'.
-//TODO FUTURE [will-do]: Default/favorite project.
-//TODO FUTURE [maybe]: On times ability to omit the leading '0'/'20' i.e. '0330' == '330', '2018' == '18'.
-
 func paceExecutor(jiraClient *jira.Client, config *Config, paceData *PaceData) func(in string) {
 	return func(in string) {
 		fields := strings.Fields(in)

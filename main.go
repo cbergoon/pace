@@ -4,12 +4,6 @@ import (
 	"github.com/c-bata/go-prompt"
 )
 
-//TODO FUTURE [maybe]: Add 'State' that is persisted to a file. This would cache issues
-//and other data to preserve state and reduce load time.
-//TODO FUTURE [will-do]: Add support for Pomodoro timer to clock. Config for 3 levels of time boxing.
-//Alerts to user (Mac OS notifications).
-//TODO FUTURE [will-do]: Support multiple projects.
-
 func main() {
 	config := NewConfig()
 	paceData := NewPaceData()
