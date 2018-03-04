@@ -60,7 +60,9 @@ func paceCompletor(paceData *PaceData) func(d prompt.Document) []prompt.Suggest 
 					if len(fields) >= 5 && d.GetCharRelativeToCursor(0) == 32 {
 						return nil
 					}
-					//todo conditionally show options depending on previous field
+					if fields[3] == "--fill"{
+						return nil
+					}
 					return []prompt.Suggest{
 						{Text: "--fill", Description: "fill date from previous or default time"},
 						{Text: "HHMM", Description: "time"},
