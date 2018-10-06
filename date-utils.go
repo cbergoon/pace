@@ -14,7 +14,7 @@ func beginningOfWeek() time.Time {
 	t := time.Now()
 	weekday := time.Duration(t.Weekday())
 	year, month, day := t.Date()
-	currentZeroDay:= time.Date(year, month, day, 0, 0, 0, 0, t.Location())
+	currentZeroDay := time.Date(year, month, day, 0, 0, 0, 0, t.Location())
 	return currentZeroDay.Add(-1 * (weekday) * 24 * time.Hour)
 }
 

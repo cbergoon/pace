@@ -1,42 +1,62 @@
 package main
 
 import (
-	"io/ioutil"
-	"github.com/pkg/errors"
-	"os"
-	"github.com/BurntSushi/toml"
-	"fmt"
-	"time"
 	"bytes"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"time"
+
+	"github.com/BurntSushi/toml"
+	"github.com/pkg/errors"
 )
 
-//TODO FUTURE [will-do]: Add functionality for default config values.
-//TODO FUTURE [maybe]: Add ability to round to nearest x duration.
+//TODO (cbergoon): Add ability to round to nearest x duration.
 
-const DEFAULT_CONFIG_FILE_LOCATION = "/.config/pace/"
-const DEFAULT_CONFIG_FILE_NAME = "config.toml"
+const DefaultConfigFileLocation = "/.config/pace/"
+const DefaultConfigFileName = "config.toml"
 
-const DEFAULT_CONFIG_FILE_CONTENT = `# Pace Configuration File
+const DefaultConfigFileContent = `# Pace Configuration File
 
 # Jira Instance Information
+
+# Jira URL of Atlassian instance to operate on. Must begin with "https://".
 JiraInstanceUrl = "https://mycompany.atlassian.net"
+
+# Jira username of to operate as. User must have ability to read and update issues. 
 JiraUsername = "john.doe"
+
+# Password of above user account. 
 JiraPassword = "password"
 
+##############################################################################################################
+
 # Appearance/Behavior
+
+# Prompt prefix display text. 
 Prompt = ">>> "
 
-# Prebuilt Query Defaults
-ProjectName = "MYPROJECT"
-QueryUsername = "john.doe"
+##############################################################################################################
 
-# JIRA User Defined JQL
-SuggestionIssueQuery = "project = MYPROJECT AND assignee = john.doe AND resolution = Unresolved ORDER BY updated DESC"
-DayWorklogIssueQuery = "project = MYPROJECT AND assignee = john.doe AND worklogDate >= startOfDay() ORDER BY created DESC"
-WeekWorklogIssueQuery = "project = MYPROJECT AND assignee = john.doe AND worklogDate >= startOfWeek() ORDER BY created DESC"
-MonthWorklogIssueQuery = "project = MYPROJECT AND assignee = john.doe AND worklogDate >= startOfMonth() ORDER BY created DESC"
+# Queries
+
+# Jira username to be used to in JQL queries to retrieve issues. Only time for specified user will be 
+# included in time log. 
+QueryUsername = "john.doe"
+SuggestionProjects = ["PR1", "PR2"]
+
+##############################################################################################################
 
 # Fill Option Behavior
+
+# FillOptionEnabled allows the log to be filled without entering date/time with each entry. Depending on 
+# network speeds, Jira instance speeds, number of projects, and project size this may cause performance 
+# issues and can be disabled with the option below.
+FillOptionEnabled = false
+
+# LogFillStartTime option sets the time that should be considered the start of the work day. The fill option
+# will use this time when entering creating the first entry of a day. Format: #### (e.g. 0800 for 8:00 AM, 
+# 1630 for 4:30 PM)
 LogFillStartTime = "0800"`
 
 type Config struct {
@@ -46,24 +66,16 @@ type Config struct {
 
 	Prompt string
 
-	ProjectName   string
-	QueryUsername string
+	QueryUsername      string
+	SuggestionProjects []string
 
-	SuggestionIssueQuery   string
-	DayWorklogIssueQuery   string
-	WeekWorklogIssueQuery  string
-	MonthWorklogIssueQuery string
-
-	DefaultProject string //todo implement
-	ProjectShortcuts []ProjectShortcut //todo implement
-
-	ClockStartTime time.Time
-
-	LogFillStartTime string //format 1625 or 0425; HHMM
+	ClockStartTime    time.Time
+	LogFillStartTime  string //format 1625 or 0425; HHMM
+	FillOptionEnabled bool
 }
 
 type ProjectShortcut struct {
-	Name string
+	Name     string
 	Shortcut string
 }
 
@@ -71,23 +83,22 @@ func NewConfig() *Config {
 	return &Config{}
 }
 
-//todo use file path joiner to remove os specific file path separator; add function to get dir; add function to get file
-
+//TODO (cbergoon): use file path joiner to remove os specific file path separator; add function to get dir; add function to get file
 func (config *Config) InitializeConfig() error {
-	if _, err := os.Stat(os.Getenv("HOME") + DEFAULT_CONFIG_FILE_LOCATION + DEFAULT_CONFIG_FILE_NAME); err != nil {
+	if _, err := os.Stat(os.Getenv("HOME") + DefaultConfigFileLocation + DefaultConfigFileName); err != nil {
 		if os.IsNotExist(err) {
-			err := os.MkdirAll(os.Getenv("HOME")+DEFAULT_CONFIG_FILE_LOCATION, os.ModePerm)
+			err := os.MkdirAll(os.Getenv("HOME")+DefaultConfigFileLocation, os.ModePerm)
 			if err != nil {
 				fmt.Println(err)
 				return errors.New("failed to create pace config directory")
 			}
-			file, err := os.Create(os.Getenv("HOME") + DEFAULT_CONFIG_FILE_LOCATION + DEFAULT_CONFIG_FILE_NAME)
+			file, err := os.Create(os.Getenv("HOME") + DefaultConfigFileLocation + DefaultConfigFileName)
 			if err != nil {
 				return errors.New("failed to create config file")
 			}
 			defer file.Close()
 
-			_, err = file.WriteString(DEFAULT_CONFIG_FILE_CONTENT)
+			_, err = file.WriteString(DefaultConfigFileContent)
 			if err != nil {
 				return errors.New("failed to write config file")
 			}
@@ -101,7 +112,7 @@ func (config *Config) InitializeConfig() error {
 		}
 	}
 
-	cbuf, err := ioutil.ReadFile(os.Getenv("HOME") + DEFAULT_CONFIG_FILE_LOCATION + DEFAULT_CONFIG_FILE_NAME)
+	cbuf, err := ioutil.ReadFile(os.Getenv("HOME") + DefaultConfigFileLocation + DefaultConfigFileName)
 	if err != nil {
 		return errors.New("failed to read configuration file")
 	}
@@ -123,7 +134,7 @@ func (config *Config) ApplyDefaults() {
 }
 
 func validateConfig(config *Config) (bool, error) {
-	//todo implement validation
+	//TODO (cbergoon): Implement validation.
 	return true, nil
 }
 
@@ -132,7 +143,7 @@ func (config *Config) PersistConfig() error {
 	if err := toml.NewEncoder(buf).Encode(config); err != nil {
 		return err
 	}
-	file, err := os.Create(os.Getenv("HOME") + DEFAULT_CONFIG_FILE_LOCATION + DEFAULT_CONFIG_FILE_NAME)
+	file, err := os.Create(os.Getenv("HOME") + DefaultConfigFileLocation + DefaultConfigFileName)
 	if err != nil {
 		return errors.New("failed to create config file")
 	}

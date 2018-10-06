@@ -1,10 +1,12 @@
 package main
 
 import (
-	"github.com/c-bata/go-prompt"
-	"github.com/andygrunwald/go-jira"
+	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/andygrunwald/go-jira"
+	"github.com/c-bata/go-prompt"
 )
 
 type PaceData struct {
@@ -31,7 +33,15 @@ func (paceData *PaceData) loadIssueQueues(jiraClient *jira.Client, config *Confi
 	paceData.WeekIssues = paceData.WeekIssues[:0]
 	paceData.MonthIssues = paceData.MonthIssues[:0]
 
-	err := jiraClient.Issue.SearchPages(config.SuggestionIssueQuery, &jira.SearchOptions{Fields: []string{"worklog", "summary"}}, func(i jira.Issue) error {
+	projectList := ""
+	for i := 0; i < len(config.SuggestionProjects); i++ {
+		if i != 0 {
+			projectList += ","
+		}
+		projectList += fmt.Sprint("\"", config.SuggestionProjects[i], "\"")
+	}
+
+	err := jiraClient.Issue.SearchPages(fmt.Sprint("project in (", projectList, ") and resolution in (Incomplete, Unresolved, \"Moved To Project\")"), &jira.SearchOptions{Fields: []string{"worklog", "summary", "issuelinks"}}, func(i jira.Issue) error {
 		paceData.UnresolvedIssues = append(paceData.UnresolvedIssues, i)
 		return nil
 	})
@@ -43,7 +53,7 @@ func (paceData *PaceData) loadIssueQueues(jiraClient *jira.Client, config *Confi
 		return err
 	}
 
-	err = jiraClient.Issue.SearchPages(config.DayWorklogIssueQuery, &jira.SearchOptions{Fields: []string{"worklog", "summary"}}, func(i jira.Issue) error {
+	err = jiraClient.Issue.SearchPages(fmt.Sprint("worklogAuthor = "+config.QueryUsername+" and worklogDate >= startOfDay()"), &jira.SearchOptions{Fields: []string{"worklog", "summary", "issuelinks"}}, func(i jira.Issue) error {
 		paceData.DayIssues = append(paceData.DayIssues, i)
 		return nil
 	})
@@ -55,7 +65,7 @@ func (paceData *PaceData) loadIssueQueues(jiraClient *jira.Client, config *Confi
 		return err
 	}
 
-	err = jiraClient.Issue.SearchPages(config.WeekWorklogIssueQuery, &jira.SearchOptions{Fields: []string{"worklog", "summary"}}, func(i jira.Issue) error {
+	err = jiraClient.Issue.SearchPages(fmt.Sprint("worklogAuthor = "+config.QueryUsername+" and worklogDate >= startOfWeek()"), &jira.SearchOptions{Fields: []string{"worklog", "summary", "issuelinks"}}, func(i jira.Issue) error {
 		paceData.WeekIssues = append(paceData.WeekIssues, i)
 		return nil
 	})
@@ -67,7 +77,7 @@ func (paceData *PaceData) loadIssueQueues(jiraClient *jira.Client, config *Confi
 		return err
 	}
 
-	err = jiraClient.Issue.SearchPages(config.MonthWorklogIssueQuery, &jira.SearchOptions{Fields: []string{"worklog", "summary"}}, func(i jira.Issue) error {
+	err = jiraClient.Issue.SearchPages(fmt.Sprint("worklogAuthor = "+config.QueryUsername+" and worklogDate >= startOfMonth()"), &jira.SearchOptions{Fields: []string{"worklog", "summary", "issuelinks"}}, func(i jira.Issue) error {
 		paceData.MonthIssues = append(paceData.MonthIssues, i)
 		return nil
 	})

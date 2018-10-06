@@ -7,18 +7,24 @@ import (
 	"github.com/andygrunwald/go-jira"
 	"sort"
 	"strconv"
+	"encoding/json"
 )
 
 type TimeStats struct {
 	TotalTime  int
-	TimeBlocks []WorkLogItem
+	TimeBlocks []WorklogItem
 }
 
-type WorkLogItem struct {
-	Start            time.Time
-	End              time.Time
-	TimeSpent        string
-	TimeSpentSeconds int
+type WorklogItem struct {
+	Start             time.Time
+	End               time.Time
+	TimeSpent         string
+	TimeSpentSeconds  int
+	Author            string
+	IssueKey          string
+	IssueSummary      string
+	AddsTimeToKey     string
+	AddsTimeToSummary string
 }
 
 func printTimeStats(timeStats *TimeStats) {
@@ -29,22 +35,45 @@ func printTimeStats(timeStats *TimeStats) {
 	fmt.Printf("Total Time: %s Entries: %s\n", totalTimeString, totalEntriesString)
 	for _, block := range timeStats.TimeBlocks {
 		timeSpentString := gocolor.ColorClear(gocolor.COLOR_RED, stringPadRight(block.TimeSpent, " ", 10))
-		fmt.Printf("%s %s to %s\n", timeSpentString, block.Start.Format(DISPLAY_DATE_FORMAT), block.End.Format(DISPLAY_DATE_FORMAT))
+		issueKeyString := stringPadRight(block.IssueKey+":", " ", 16)
+		authorString := stringPadRight(block.Author, " ", 28)
+		linkString := "";
+		if block.AddsTimeToKey != "" {
+			linkString = fmt.Sprint(" ->  ", stringPadRight(block.AddsTimeToKey+":", " ", 16), block.AddsTimeToSummary)
+		}
+		fmt.Printf("%s %s %s to %s \t %s %s %s \n", authorString, timeSpentString, block.Start.Format(DISPLAY_DATE_FORMAT), block.End.Format(DISPLAY_DATE_FORMAT), issueKeyString, block.IssueSummary, linkString)
 	}
 }
 
 func generateTimeStats(issues []jira.Issue, after func() time.Time, user string) *TimeStats {
 	stats := &TimeStats{}
 	for _, issue := range issues {
+		if len(issue.Fields.IssueLinks) > 0 {
+			b, _ := json.MarshalIndent(issue, " ", "\t")
+			fmt.Println(string(b))
+		}
 		for _, worklog := range issue.Fields.Worklog.Worklogs {
 			if worklog.Author.Name == user {
 				if time.Time(worklog.Started).After(after()) {
+					addsTimeToKey := ""
+					addsTimeToSummary := ""
+					for i := 0; i < len(issue.Fields.IssueLinks); i++ {
+						if issue.Fields.IssueLinks[i].Type.Name == "Adds Time" && issue.Fields.IssueLinks[i].OutwardIssue != nil {
+							addsTimeToKey = issue.Fields.IssueLinks[i].OutwardIssue.Key
+							addsTimeToSummary = issue.Fields.IssueLinks[i].OutwardIssue.Fields.Summary
+						}
+					}
 					stats.TotalTime += worklog.TimeSpentSeconds
-					stats.TimeBlocks = append(stats.TimeBlocks, WorkLogItem{
-						TimeSpentSeconds: worklog.TimeSpentSeconds,
-						TimeSpent:        worklog.TimeSpent,
-						Start:            time.Time(worklog.Started),
-						End:              time.Time(worklog.Started).Add(time.Second * time.Duration(worklog.TimeSpentSeconds)),
+					stats.TimeBlocks = append(stats.TimeBlocks, WorklogItem{
+						TimeSpentSeconds:  worklog.TimeSpentSeconds,
+						TimeSpent:         worklog.TimeSpent,
+						Start:             time.Time(worklog.Started),
+						End:               time.Time(worklog.Started).Add(time.Second * time.Duration(worklog.TimeSpentSeconds)),
+						Author:            worklog.Author.Name,
+						IssueKey:          issue.Key,
+						IssueSummary:      issue.Fields.Summary,
+						AddsTimeToKey:     addsTimeToKey,
+						AddsTimeToSummary: addsTimeToSummary,
 					})
 				}
 			}

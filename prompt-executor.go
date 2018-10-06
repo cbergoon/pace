@@ -1,10 +1,11 @@
 package main
 
 import (
-	"strings"
 	"fmt"
-	"time"
 	"strconv"
+	"strings"
+	"time"
+
 	"github.com/andygrunwald/go-jira"
 )
 
@@ -69,8 +70,8 @@ func paceExecutor(jiraClient *jira.Client, config *Config, paceData *PaceData) f
 				return
 			}
 
-			var hour int64 = 0
-			var minute int64 = 0
+			var hour int64
+			var minute int64
 			if strings.Contains(fields[2], "h") {
 				tmp := strings.Replace(fields[2], "m", "", 1)
 				parts := strings.Split(tmp, "h")
@@ -116,7 +117,7 @@ func paceExecutor(jiraClient *jira.Client, config *Config, paceData *PaceData) f
 						}
 						dateFill = time.Date(dateFill.Year(), dateFill.Month(), dateFill.Day(), timeOnlyDateFill.Hour(), timeOnlyDateFill.Minute(), 0, 0, time.Local)
 					}
-				}else{
+				} else {
 					var err error
 					dateFill, err = time.ParseInLocation("20060102", fmt.Sprint(fields[3]), time.Local)
 					if err != nil {
@@ -166,7 +167,9 @@ func paceExecutor(jiraClient *jira.Client, config *Config, paceData *PaceData) f
 				return
 			}
 
-			paceData.loadIssueQueues(jiraClient, config)
+			if config.FillOptionEnabled {
+				paceData.loadIssueQueues(jiraClient, config)
+			}
 
 			return
 		} else if strings.Compare(fields[0], "issues") == 0 {

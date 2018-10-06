@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/c-bata/go-prompt"
 	"strings"
+
+	"github.com/c-bata/go-prompt"
 )
 
-func paceCompletor(paceData *PaceData) func(d prompt.Document) []prompt.Suggest {
+func paceCompletor(config *Config, paceData *PaceData) func(d prompt.Document) []prompt.Suggest {
 	return func(d prompt.Document) []prompt.Suggest {
 		fields := strings.Fields(d.Text)
 		if len(fields) > 0 {
@@ -50,6 +51,12 @@ func paceCompletor(paceData *PaceData) func(d prompt.Document) []prompt.Suggest 
 					return prompt.FilterContains(paceData.TimeSuggestions, d.GetWordBeforeCursor(), true)
 				}
 				if (len(fields) == 3 && d.GetCharRelativeToCursor(0) == 32) || (len(fields) == 4 && d.GetCharRelativeToCursor(0) != 32) {
+					if config.FillOptionEnabled {
+						return []prompt.Suggest{
+							{Text: "--fill", Description: "fill current day from previous or default time"},
+							{Text: "YYYYMMDD", Description: "date"},
+						}
+					}
 					return []prompt.Suggest{
 						{Text: "--fill", Description: "fill current day from previous or default time"},
 						{Text: "YYYYMMDD", Description: "date"},
@@ -60,8 +67,14 @@ func paceCompletor(paceData *PaceData) func(d prompt.Document) []prompt.Suggest 
 					if len(fields) >= 5 && d.GetCharRelativeToCursor(0) == 32 {
 						return nil
 					}
-					if fields[3] == "--fill"{
+					if fields[3] == "--fill" {
 						return nil
+					}
+					if config.FillOptionEnabled {
+						return []prompt.Suggest{
+							{Text: "--fill", Description: "fill date from previous or default time"},
+							{Text: "HHMM", Description: "time"},
+						}
 					}
 					return []prompt.Suggest{
 						{Text: "--fill", Description: "fill date from previous or default time"},

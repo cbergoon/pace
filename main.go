@@ -25,7 +25,7 @@ func main() {
 
 	p := prompt.New(
 		paceExecutor(jiraClient, config, paceData),
-		paceCompletor(paceData),
+		paceCompletor(config, paceData),
 		prompt.OptionPrefix(">>> "),
 		prompt.OptionTitle("pace-prompt"),
 
