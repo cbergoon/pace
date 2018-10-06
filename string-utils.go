@@ -19,11 +19,11 @@ func stringIsNumeric(s string) bool {
 	return err == nil
 }
 
-func stringPadRight(str, pad string, lenght int) string {
+func stringPadRight(str, pad string, length int) string {
 	for {
 		str += pad
-		if len(str) > lenght {
-			return str[0:lenght]
+		if len(str) > length {
+			return str[0:length]
 		}
 	}
 }
