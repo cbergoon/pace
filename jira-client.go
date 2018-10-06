@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/andygrunwald/go-jira"
 	"errors"
+
+	"github.com/andygrunwald/go-jira"
 )
 
 func configureNewJiraClient(url, username, password string) (*jira.Client, error) {

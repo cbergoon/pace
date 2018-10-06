@@ -1,13 +1,13 @@
 package main
 
 import (
-	"strings"
 	"strconv"
+	"strings"
 )
 
 func stringContainsAny(s string, args ...string) bool {
 	for _, arg := range args {
-		if (strings.Contains(s, arg)) {
+		if strings.Contains(s, arg) {
 			return true
 		}
 	}

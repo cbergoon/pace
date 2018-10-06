@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/andygrunwald/go-jira"
 	"bytes"
+
+	"github.com/andygrunwald/go-jira"
 )
 
 //Worklog request represents the request object used to make request to JIRA API.

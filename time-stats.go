@@ -1,13 +1,14 @@
 package main
 
 import (
-	"time"
-	"github.com/cbergoon/gocolor"
+	"encoding/json"
 	"fmt"
-	"github.com/andygrunwald/go-jira"
 	"sort"
 	"strconv"
-	"encoding/json"
+	"time"
+
+	"github.com/andygrunwald/go-jira"
+	"github.com/cbergoon/gocolor"
 )
 
 type TimeStats struct {
@@ -37,7 +38,7 @@ func printTimeStats(timeStats *TimeStats) {
 		timeSpentString := gocolor.ColorClear(gocolor.COLOR_RED, stringPadRight(block.TimeSpent, " ", 10))
 		issueKeyString := stringPadRight(block.IssueKey+":", " ", 16)
 		authorString := stringPadRight(block.Author, " ", 28)
-		linkString := "";
+		linkString := ""
 		if block.AddsTimeToKey != "" {
 			linkString = fmt.Sprint(" ->  ", stringPadRight(block.AddsTimeToKey+":", " ", 16), block.AddsTimeToSummary)
 		}
