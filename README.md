@@ -7,11 +7,33 @@
 
 [![asciicast](https://asciinema.org/a/204973.png)](https://asciinema.org/a/204973?t=8)
 
-Pace provides an easy way to manage worklogs in Jira. 
+Pace provides an easy way to manage and track worklog entries in Jira. 
 
 #### Install
 
+```
+$ go get github.com/cbergoon/pace
+```
 
+Run Pace with ```$ pace``` to generate the default configuration file in ```~/.config/pace/config.toml```
+
+Update the configuration file with details from your Jira instance and Jira Projects. 
 
 #### Usage
+
+Run Pace with ```$ pace``` 
+
+##### Time
+
+Time allows you to view worklogs for a given time period. 
+
+##### Log
+
+Log allows you to create worklogs for a given issue. 
+
+The format of the command is: 
+``` 
+>>> log ISSUE-100 1h30m 20181005 0900
+``` 
+
 
