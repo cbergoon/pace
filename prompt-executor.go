@@ -26,7 +26,7 @@ func paceExecutor(jiraClient *jira.Client, config *Config, paceData *PaceData) f
 				return
 			}
 			if len(fields) == 1 {
-				fmt.Println("Clock started " + time.Now().Sub(config.ClockStartTime).Truncate(time.Minute).String() + " ago at " + config.ClockStartTime.Format(DISPLAY_DATE_FORMAT))
+				fmt.Println("Clock started " + time.Now().Sub(config.ClockStartTime).Truncate(time.Minute).String() + " ago at " + config.ClockStartTime.Format(DisplayDateFormat))
 				return
 			}
 			if strings.Compare(fields[1], "start") == 0 {

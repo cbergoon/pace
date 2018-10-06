@@ -42,7 +42,7 @@ func printTimeStats(timeStats *TimeStats) {
 		if block.AddsTimeToKey != "" {
 			linkString = fmt.Sprint(" ->  ", stringPadRight(block.AddsTimeToKey+":", " ", 16), block.AddsTimeToSummary)
 		}
-		fmt.Printf("%s %s %s to %s \t %s %s %s \n", authorString, timeSpentString, block.Start.Format(DISPLAY_DATE_FORMAT), block.End.Format(DISPLAY_DATE_FORMAT), issueKeyString, block.IssueSummary, linkString)
+		fmt.Printf("%s %s %s to %s \t %s %s %s \n", authorString, timeSpentString, block.Start.Format(DisplayDateFormat), block.End.Format(DisplayDateFormat), issueKeyString, block.IssueSummary, linkString)
 	}
 }
 

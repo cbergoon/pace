@@ -2,7 +2,8 @@ package main
 
 import "time"
 
-const DISPLAY_DATE_FORMAT string = "2006-01-02 15:04:05"
+// DisplayDateFormat defines the format for date output.
+const DisplayDateFormat string = "2006-01-02 15:04:05"
 
 func beginningOfDay() time.Time {
 	t := time.Now()

@@ -6,7 +6,7 @@ import (
 	"github.com/andygrunwald/go-jira"
 )
 
-//Worklog request represents the request object used to make request to JIRA API.
+//WorklogRequest represents the request object used to make request to JIRA API.
 //This is a data type is a minimal subset of the Worklog type included in the go-jira
 //library. The included data type JSON representation cannot be used to create a
 //worklog entry with only the fields below.
