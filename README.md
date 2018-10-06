@@ -36,7 +36,7 @@ The general format of the command is:
 >>> log ISSUE-100 1h30m 20181005 0900
 ``` 
 
-Issues will be searched by the issue key and a list of options to select from will be displayed below. The duration parameter should be in the form of <H>h<M>m (e.g. 1h30m for 1 hour and 30 minutes). The date and time should follow the format suggested by the prompt; "YYYYMMDD" and "HHMM" (e.g. 20181005 for 5 October 2018). If the ```FillOptionEnabled``` flag is true in the cofiguration file and alternative option will be available for date and time: ```--fill```. This option will set the starting time of the worklog entry to be created to the computed end time of the last work log. 
+Issues will be searched by the issue key and a list of options to select from will be displayed below. The duration parameter should be in the form of \<H\>h\<M\>m (e.g. 1h30m for 1 hour and 30 minutes). The date and time should follow the format suggested by the prompt; "YYYYMMDD" and "HHMM" (e.g. 20181005 for 5 October 2018). If the ```FillOptionEnabled``` flag is true in the cofiguration file and alternative option will be available for date and time: ```--fill```. This option will set the starting time of the worklog entry to be created to the computed end time of the last work log. 
 
 #### Refresh
 
