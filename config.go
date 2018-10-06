@@ -13,10 +13,10 @@ import (
 
 //TODO (cbergoon): Add ability to round to nearest x duration.
 
-const DefaultConfigFileLocation = "/.config/pace/"
-const DefaultConfigFileName = "config.toml"
+const defaultConfigFileLocation = "/.config/pace/"
+const defaultConfigFileName = "config.toml"
 
-const DefaultConfigFileContent = `# Pace Configuration File
+const defaultConfigFileContent = `# Pace Configuration File
 
 # Jira Instance Information
 
@@ -83,22 +83,22 @@ func NewConfig() *Config {
 	return &Config{}
 }
 
-//TODO (cbergoon): use file path joiner to remove os specific file path separator; add function to get dir; add function to get file
 func (config *Config) InitializeConfig() error {
-	if _, err := os.Stat(os.Getenv("HOME") + DefaultConfigFileLocation + DefaultConfigFileName); err != nil {
+	//TODO (cbergoon): use file path joiner to remove os specific file path separator; add function to get dir; add function to get file
+	if _, err := os.Stat(os.Getenv("HOME") + defaultConfigFileLocation + defaultConfigFileName); err != nil {
 		if os.IsNotExist(err) {
-			err := os.MkdirAll(os.Getenv("HOME")+DefaultConfigFileLocation, os.ModePerm)
+			err := os.MkdirAll(os.Getenv("HOME")+defaultConfigFileLocation, os.ModePerm)
 			if err != nil {
 				fmt.Println(err)
 				return errors.New("failed to create pace config directory")
 			}
-			file, err := os.Create(os.Getenv("HOME") + DefaultConfigFileLocation + DefaultConfigFileName)
+			file, err := os.Create(os.Getenv("HOME") + defaultConfigFileLocation + defaultConfigFileName)
 			if err != nil {
 				return errors.New("failed to create config file")
 			}
 			defer file.Close()
 
-			_, err = file.WriteString(DefaultConfigFileContent)
+			_, err = file.WriteString(defaultConfigFileContent)
 			if err != nil {
 				return errors.New("failed to write config file")
 			}
@@ -112,7 +112,7 @@ func (config *Config) InitializeConfig() error {
 		}
 	}
 
-	cbuf, err := ioutil.ReadFile(os.Getenv("HOME") + DefaultConfigFileLocation + DefaultConfigFileName)
+	cbuf, err := ioutil.ReadFile(os.Getenv("HOME") + defaultConfigFileLocation + defaultConfigFileName)
 	if err != nil {
 		return errors.New("failed to read configuration file")
 	}
@@ -143,7 +143,7 @@ func (config *Config) PersistConfig() error {
 	if err := toml.NewEncoder(buf).Encode(config); err != nil {
 		return err
 	}
-	file, err := os.Create(os.Getenv("HOME") + DefaultConfigFileLocation + DefaultConfigFileName)
+	file, err := os.Create(os.Getenv("HOME") + defaultConfigFileLocation + defaultConfigFileName)
 	if err != nil {
 		return errors.New("failed to create config file")
 	}
